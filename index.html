@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Operator guide to the AGV robot controller app: connecting, autonomous runs, saving maps and reviewing saved images.">
+<meta name="color-scheme" content="light dark">
+<title>AGV Operator Manual</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* --- baseline the artifact host used to provide --- */
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{-webkit-text-size-adjust:100%}
+img{max-width:100%}
+[hidden]{display:none!important}
+
+/* Layout: single reading column; each screen is a figure + its numbered keys side by side, stacking at phone width. */
+:root{
+  --bg:#F5F8F3;
+  --paper:#FFFFFF;
+  --fg:#111A0E;
+  --muted:#5A6E55;
+  --rule:#D5E0D0;
+  --accent:#3E8526;
+  --accent-soft:#EAF3E5;
+  --warn:#9A6B00;
+  --danger:#C0392B;
+  --code-bg:#EDF2EA;
+  --display:"Rajdhani","Trebuchet MS",sans-serif;
+  --body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1A10;
+    --paper:#15271B;
+    --fg:#EAF7E1;
+    --muted:#8FB89B;
+    --rule:#2A4632;
+    --accent:#6FD24A;
+    --accent-soft:#1E3526;
+    --warn:#F5B301;
+    --danger:#E5533D;
+    --code-bg:#1E3526;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1A10;
+  --paper:#15271B;
+  --fg:#EAF7E1;
+  --muted:#8FB89B;
+  --rule:#2A4632;
+  --accent:#6FD24A;
+  --accent-soft:#1E3526;
+  --warn:#F5B301;
+  --danger:#E5533D;
+  --code-bg:#1E3526;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.6;
+  margin:0;
+  padding-inline:16px;
+  padding-block:0;
+}
+.wrap{max-width:1080px;margin:0 auto;padding-block:40px 72px}
+
+/* ---- masthead ---- */
+.mast{border-bottom:3px solid var(--accent);padding-bottom:22px;margin-bottom:8px}
+.eyebrow{
+  font-family:var(--display);font-weight:700;font-size:12px;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin:0 0 6px
+}
+h1{
+  font-family:var(--display);font-weight:700;font-size:clamp(34px,7vw,56px);
+  line-height:1.02;letter-spacing:.01em;margin:0;text-wrap:balance
+}
+.sub{color:var(--muted);font-size:17px;margin:12px 0 0;max-width:62ch}
+
+.note{
+  background:var(--accent-soft);border-left:3px solid var(--accent);
+  padding:14px 18px;margin:26px 0 0;border-radius:0 8px 8px 0;font-size:15px
+}
+.note strong{font-family:var(--display);letter-spacing:.04em}
+
+/* ---- sections ---- */
+section{margin-top:56px;scroll-margin-top:24px}
+h2{
+  font-family:var(--display);font-weight:700;font-size:clamp(24px,4vw,32px);
+  letter-spacing:.01em;margin:0 0 4px;text-wrap:balance;
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap
+}
+h2 .num{
+  font-size:14px;letter-spacing:.14em;color:var(--accent);
+  border:1.5px solid var(--accent);border-radius:999px;padding:3px 11px;
+  flex:none;line-height:1.2
+}
+h3{
+  font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:.05em;
+  text-transform:uppercase;margin:34px 0 10px;color:var(--fg)
+}
+.lede{color:var(--muted);margin:0 0 4px;max-width:66ch}
+p{max-width:66ch}
+
+/* ---- figure + keys ---- */
+.screen{
+  display:grid;grid-template-columns:minmax(0,290px) minmax(0,1fr);
+  gap:34px;align-items:start;margin-top:26px
+}
+@media (max-width:720px){.screen{grid-template-columns:1fr;gap:22px}}
+figure{margin:0}
+figure svg{display:block;width:100%;height:auto;max-width:100%;border-radius:14px;border:1px solid var(--rule)}
+figcaption{
+  font-family:var(--display);font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);margin-top:10px
+}
+
+/* numbered key list keyed to the figure badges */
+ol.keys{list-style:none;counter-reset:k;margin:0;padding:0;display:grid;gap:13px}
+ol.keys li{
+  counter-increment:k;position:relative;padding-left:38px;font-size:15.3px;min-width:0
+}
+ol.keys li::before{
+  content:counter(k);position:absolute;left:0;top:1px;
+  width:25px;height:25px;border-radius:999px;
+  background:var(--accent);color:var(--bg);
+  font-family:var(--display);font-weight:700;font-size:14px;
+  display:grid;place-items:center
+}
+ol.keys b{font-weight:600}
+
+/* ---- ordered procedure ---- */
+ol.steps{padding-left:22px;margin:14px 0;display:grid;gap:10px}
+ol.steps li{padding-left:4px;max-width:64ch}
+ul.plain{padding-left:20px;margin:12px 0;display:grid;gap:8px}
+ul.plain li{max-width:64ch}
+
+/* ---- tables ---- */
+.tscroll{overflow-x:auto;margin:16px 0;border:1px solid var(--rule);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:480px;background:var(--paper);font-size:14.8px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{
+  font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);background:var(--code-bg)
+}
+tr:last-child td{border-bottom:none}
+td b{font-weight:600}
+
+/* severity chips in the banner table */
+.chip{
+  display:inline-block;font-family:var(--display);font-weight:700;font-size:11.5px;
+  letter-spacing:.09em;padding:3px 9px;border-radius:5px;color:#fff;white-space:nowrap
+}
+.c-nopath{background:#C62828}.c-danger{background:#E53935}
+.c-caution{background:#C98A00}.c-field{background:#546E7A}
+
+code{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.9em;
+  background:var(--code-bg);padding:1.5px 6px;border-radius:4px
+}
+
+.callout{
+  border:1px solid var(--rule);border-radius:10px;padding:16px 18px;
+  background:var(--paper);margin:20px 0;font-size:15px
+}
+.callout.warn{border-left:3px solid var(--warn)}
+.callout h4{
+  font-family:var(--display);font-size:15px;letter-spacing:.07em;text-transform:uppercase;
+  margin:0 0 6px;color:var(--warn)
+}
+.callout p{margin:0;max-width:64ch}
+
+hr.end{border:none;border-top:1px solid var(--rule);margin:56px 0 0}
+.foot{color:var(--muted);font-size:14px;margin-top:18px}
+
+/* --- print: forced light, and no component split across a page break --- */
+@media print{
+  @page{margin:14mm}
+  :root{
+    --bg:#fff;--paper:#fff;--fg:#14190F;--muted:#4A5547;--rule:#BFC9BB;
+    --accent:#2F6B1C;--accent-soft:#F1F6ED;--warn:#7A5400;--danger:#A3302A;--code-bg:#F1F3EF;
+    color-scheme:light;
+  }
+  body{padding-inline:0}
+  .wrap{max-width:none;padding-block:0}
+  h2,h3{break-after:avoid}
+  .screen,figure,.callout,.note,tr{break-inside:avoid}
+  .tscroll{overflow:visible;border:none}
+  table{min-width:0;border:1px solid var(--rule)}
+  .foot{break-before:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow">Field Operation Guide</p>
+  <h1>AGV&nbsp;Robot&nbsp;Controller</h1>
+  <p class="sub">How to connect to the robot, run it autonomously, and get at the maps and photos it saves — using the Android controller app.</p>
+</header>
+
+<div class="note">
+  <strong>Who this is for.</strong> Everything in this manual is a control an operator can reach from a normal install of the app. Bench-test and calibration controls are not covered.
+</div>
+
+<section id="before">
+  <h2><span class="num">01</span> Before you switch on</h2>
+  <p class="lede">The phone talks to the robot over Wi-Fi. Both have to be on the same network, and the robot needs about a minute after power-up before it starts answering.</p>
+  <ol class="steps">
+    <li>Power the robot. Its software starts on its own — nothing to launch by hand.</li>
+    <li>Put the phone on the <b>same Wi-Fi network</b> as the robot. There is no Bluetooth or direct-cable fallback.</li>
+    <li>Have the robot's <b>IP address</b> to hand. It is the number you type on the first screen, and it can change when the robot joins a different network.</li>
+    <li>So photos are tagged with a position, start the robot <b>outdoors with open sky</b>. A fix needs at least four satellites and usually takes a few minutes from cold.</li>
+    <li>Wait roughly <b>60 seconds</b> after power-up, then connect.</li>
+  </ol>
+  <div class="callout warn">
+    <h4>Clear the area first</h4>
+    <p>Once you press START AUTO the robot drives off by itself. Stand clear of it, and keep the phone in your hand the whole time it is moving — the red stop button is the fastest way to halt it.</p>
+  </div>
+</section>
+
+<section id="connect">
+  <h2><span class="num">02</span> Connecting to the robot</h2>
+  <p class="lede">The first screen does one job: point the app at the robot.</p>
+
+  <div class="screen">
+    <figure>
+      <svg viewBox="0 0 300 600" role="img" aria-label="Connection screen with an IP address field and a CONNECT button">
+        <rect width="300" height="600" rx="14" fill="#0C1A10"/>
+        <!-- logo badge -->
+        <rect x="100" y="86" width="100" height="100" rx="26" fill="#15271B" stroke="#2A4632"/>
+        <g stroke="#6FD24A" stroke-width="2.4" fill="none" stroke-linecap="round">
+          <path d="M126 150h48"/><path d="M134 150v-16h32v16"/>
+          <circle cx="138" cy="158" r="7"/><circle cx="162" cy="158" r="7"/>
+          <path d="M150 134v-12"/>
+        </g>
+        <!-- wordmark -->
+        <text x="150" y="226" text-anchor="middle" fill="#EAF7E1" font-family="Rajdhani,sans-serif" font-size="40" font-weight="700" letter-spacing="7">AGV</text>
+        <text x="150" y="246" text-anchor="middle" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="9.5" font-weight="600" letter-spacing="2.4">AUTONOMOUS GROUND VEHICLE</text>
+        <!-- ip field -->
+        <rect x="28" y="300" width="244" height="54" rx="13" fill="#1E3526" stroke="#2A4632"/>
+        <text x="46" y="316" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="10.5" letter-spacing=".6">Raspberry Pi IP Address</text>
+        <g stroke="#8FB89B" stroke-width="1.5" fill="none"><rect x="44" y="328" width="14" height="10" rx="2"/><path d="M48 342h6"/></g>
+        <text x="68" y="340" fill="#EAF7E1" font-family="IBM Plex Mono,monospace" font-size="15" letter-spacing="1">192.168.1.24</text>
+        <!-- connect button -->
+        <rect x="28" y="378" width="244" height="54" rx="14" fill="#6FD24A"/>
+        <g stroke="#06210C" stroke-width="2.2" fill="none" stroke-linecap="round"><path d="M120 398v9"/><path d="M113 400a11 11 0 1 0 14 0"/></g>
+        <text x="152" y="412" fill="#06210C" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" letter-spacing="1.4">CONNECT</text>
+        <!-- helper -->
+        <text x="150" y="458" text-anchor="middle" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="11.5">Make sure your phone and the Pi are</text>
+        <text x="150" y="474" text-anchor="middle" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="11.5">on the same Wi-Fi.</text>
+        <!-- callouts -->
+        <circle cx="286" cy="314" r="13" fill="#6FD24A"/><text x="286" y="319" text-anchor="middle" fill="#06210C" font-family="Rajdhani,sans-serif" font-size="15" font-weight="700">1</text>
+        <circle cx="286" cy="405" r="13" fill="#6FD24A"/><text x="286" y="410" text-anchor="middle" fill="#06210C" font-family="Rajdhani,sans-serif" font-size="15" font-weight="700">2</text>
+      </svg>
+      <figcaption>Fig. 1 — Connection screen</figcaption>
+    </figure>
+    <ol class="keys">
+      <li><b>Raspberry Pi IP Address.</b> Replace the placeholder with the robot's actual address, for example <code>192.168.1.24</code>. The app keeps no list of past addresses, so re-enter it each launch.</li>
+      <li><b>CONNECT.</b> Opens the control screen straight away, whether or not the address was reachable. Check the Wi-Fi icon at the top right of the control screen to see whether the link really came up.</li>
+    </ol>
+  </div>
+
+  <p>If the icon shows as disconnected, the app keeps retrying on its own and the status line reads <code>Reconnecting…</code>. You do not need to back out and press CONNECT again unless you mistyped the address.</p>
+</section>
+
+<section id="control">
+  <h2><span class="num">03</span> The control screen</h2>
+  <p class="lede">This is where the robot is driven and watched. The live camera fills the screen, with status and controls layered over it.</p>
+
+  <div class="screen">
+    <figure>
+      <svg viewBox="0 0 330 660" role="img" aria-label="Control screen showing the live camera, detection box, top button bar, a caution banner and the bottom status panel">
+        <defs><clipPath id="scr3"><rect width="330" height="660" rx="14"/></clipPath></defs>
+        <g clip-path="url(#scr3)">
+        <rect width="330" height="660" fill="#0C1A10"/>
+        <!-- camera feed: simple field scene -->
+        <rect width="330" height="660" fill="#1b2a18"/>
+        <path d="M0 300h330v360H0z" fill="#2f3d22"/>
+        <path d="M0 300h330v26H0z" fill="#3b4a2a"/>
+        <ellipse cx="90" cy="470" rx="78" ry="26" fill="#27341c"/>
+        <ellipse cx="256" cy="402" rx="52" ry="18" fill="#27341c"/>
+        <!-- a plant in frame -->
+        <g stroke="#4a6b2e" stroke-width="5" fill="none" stroke-linecap="round">
+          <path d="M150 432v-54"/><path d="M150 398c-16-10-24-4-30 4"/><path d="M150 388c15-11 24-6 30 3"/><path d="M150 410c-13 6-16 14-14 22"/>
+        </g>
+        <ellipse cx="150" cy="434" rx="30" ry="8" fill="#22301a"/>
+        <!-- AI detection box -->
+        <rect x="112" y="356" width="78" height="90" fill="none" stroke="#6FD24A" stroke-width="2.5"/>
+        <rect x="112" y="340" width="56" height="16" fill="#6FD24A" fill-opacity=".85"/>
+        <text x="117" y="352" fill="#fff" font-family="Rajdhani,sans-serif" font-size="11" font-weight="600">Obstacle</text>
+        <!-- AI age badge -->
+        <rect x="12" y="612" width="84" height="20" rx="5" fill="#000" fill-opacity=".55"/>
+        <text x="20" y="626" fill="#fff" font-family="Rajdhani,sans-serif" font-size="11" font-weight="600">AI 1.4s ago</text>
+
+        <!-- top bar -->
+        <rect x="14" y="14" width="74" height="36" rx="18" fill="#15271B" fill-opacity=".85" stroke="#F5B301" stroke-opacity=".6"/>
+        <g fill="#F5B301"><rect x="26" y="25" width="14" height="12" rx="3"/><circle cx="30" cy="29" r="1.6" fill="#15271B"/><circle cx="36" cy="29" r="1.6" fill="#15271B"/></g>
+        <text x="48" y="37" fill="#F5B301" font-family="Rajdhani,sans-serif" font-size="14" font-weight="700" letter-spacing="1.4">AUTO</text>
+        <!-- run timer -->
+        <rect x="94" y="14" width="56" height="36" rx="18" fill="#15271B" fill-opacity=".85" stroke="#F5B301"/>
+        <circle cx="108" cy="32" r="5" fill="#F5B301"/>
+        <text x="118" y="37" fill="#EAF7E1" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="600">04:12</text>
+        <!-- circular buttons -->
+        <g font-family="Rajdhani,sans-serif">
+          <circle cx="212" cy="32" r="16" fill="#15271B" fill-opacity=".85" stroke="#2A4632"/>
+          <g stroke="#EAF7E1" stroke-width="1.7" fill="none" stroke-linecap="round"><path d="M206 30a9 9 0 0 1 12 0"/><path d="M209 34a5 5 0 0 1 6 0"/></g>
+          <circle cx="246" cy="32" r="16" fill="#15271B" fill-opacity=".85" stroke="#2A4632"/>
+          <g stroke="#6FD24A" stroke-width="1.7" fill="none"><circle cx="246" cy="32" r="7"/><circle cx="246" cy="32" r="3"/></g>
+          <circle cx="280" cy="32" r="16" fill="#15271B" fill-opacity=".85" stroke="#2A4632"/>
+          <g stroke="#6FD24A" stroke-width="1.7" fill="none" stroke-linecap="round"><circle cx="280" cy="33" r="7"/><path d="M280 33v-4"/><path d="M277 24h6"/></g>
+          <circle cx="314" cy="32" r="16" fill="#E53935" stroke="#E53935"/>
+          <rect x="308" y="26" width="12" height="12" rx="2" fill="#fff"/>
+        </g>
+        <!-- gallery button pushed to second row for space -->
+        <circle cx="296" cy="68" r="16" fill="#15271B" fill-opacity=".85" stroke="#2A4632"/>
+        <g stroke="#6FD24A" stroke-width="1.7" fill="none"><rect x="289" y="62" width="14" height="11" rx="2"/><path d="M292 70l3-3 3 3"/></g>
+
+        <!-- caution banner -->
+        <rect x="52" y="96" width="226" height="38" rx="13" fill="#FFB300" fill-opacity=".94"/>
+        <g stroke="#fff" stroke-width="2" fill="none"><path d="M70 124l9-16 9 16z"/><path d="M79 114v4"/></g>
+        <text x="96" y="114" fill="#fff" font-family="Rajdhani,sans-serif" font-size="15" font-weight="800" letter-spacing="1.2">CAUTION</text>
+        <text x="96" y="128" fill="#fff" font-family="Rajdhani,sans-serif" font-size="11.5" font-weight="600">FRONT-LEFT - 0.84m  -  TURNING RIGHT</text>
+
+        <!-- bottom panel -->
+        <path d="M0 468h330v192H0z" fill="#0C1A10" fill-opacity=".94"/>
+        <path d="M0 468q0-26 26-26h278q26 0 26 26" fill="#0C1A10" fill-opacity=".94"/>
+        <path d="M26 442h278" stroke="#F5B301" stroke-opacity=".45" stroke-width="1.5"/>
+        <text x="22" y="470" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="11" letter-spacing="1.5">SYSTEM STATUS</text>
+        <text x="22" y="492" fill="#EAF7E1" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700">Connected</text>
+        <g stroke="#6FD24A" stroke-width="1.5" fill="none"><circle cx="27" cy="508" r="5"/><path d="M27 503v10"/></g>
+        <text x="38" y="513" fill="#EAF7E1" font-family="Rajdhani,sans-serif" font-size="12.5" font-weight="600" letter-spacing=".5">GPS · FIX 1 · 9 SAT</text>
+        <!-- start auto button -->
+        <rect x="22" y="532" width="162" height="44" rx="12" fill="#F5B301"/>
+        <g fill="#2A1B00"><circle cx="44" cy="554" r="9"/><path d="M41 549l8 5-8 5z" fill="#F5B301"/></g>
+        <text x="60" y="560" fill="#2A1B00" font-family="Rajdhani,sans-serif" font-size="15" font-weight="700" letter-spacing="1">STOP AUTO</text>
+        <!-- gps chip -->
+        <rect x="22" y="586" width="112" height="28" rx="14" fill="#15271B" fill-opacity=".85" stroke="#2A4632"/>
+        <g stroke="#5AB552" stroke-width="1.4" fill="none"><circle cx="38" cy="600" r="4.5"/><path d="M38 595v10"/></g>
+        <text x="50" y="605" fill="#5AB552" font-family="Rajdhani,sans-serif" font-size="11.5" font-weight="700" letter-spacing=".5">GPS  9 sats</text>
+
+        <!-- callout badges -->
+        <g font-family="Rajdhani,sans-serif" font-size="14" font-weight="700">
+          <circle cx="24" cy="76" r="13" fill="#6FD24A"/><text x="24" y="81" text-anchor="middle" fill="#06210C">1</text>
+          <circle cx="156" cy="76" r="13" fill="#6FD24A"/><text x="156" y="81" text-anchor="middle" fill="#06210C">2</text>
+          <circle cx="314" cy="104" r="13" fill="#6FD24A"/><text x="314" y="109" text-anchor="middle" fill="#06210C">3</text>
+          <circle cx="24" cy="160" r="13" fill="#6FD24A"/><text x="24" y="165" text-anchor="middle" fill="#06210C">4</text>
+          <circle cx="212" cy="390" r="13" fill="#6FD24A"/><text x="212" y="395" text-anchor="middle" fill="#06210C">5</text>
+          <circle cx="306" cy="492" r="13" fill="#6FD24A"/><text x="306" y="497" text-anchor="middle" fill="#06210C">6</text>
+          <circle cx="206" cy="554" r="13" fill="#6FD24A"/><text x="206" y="559" text-anchor="middle" fill="#06210C">7</text>
+          <circle cx="156" cy="600" r="13" fill="#6FD24A"/><text x="156" y="605" text-anchor="middle" fill="#06210C">8</text>
+        </g>
+        </g>
+      </svg>
+      <figcaption>Fig. 2 — Control screen, autonomous run under way</figcaption>
+    </figure>
+    <ol class="keys">
+      <li><b>Mode indicator.</b> Shows <code>AUTO</code> in amber while the robot is driving itself. It is a status marker, not a button — use the large button at the bottom to change mode.</li>
+      <li><b>Run timer.</b> Appears only while a run is being recorded, counting up from the moment AUTO started. The finished run lands in Run Logs.</li>
+      <li><b>Top button bar.</b> Left to right: Wi-Fi state (status only, not pressable), Lidar Map, Run logs, Saved Images, and the red <b>Emergency Stop</b>.</li>
+      <li><b>Warning banners.</b> Stack here when the robot sees something. They clear themselves — see the table below.</li>
+      <li><b>Detection box.</b> Drawn where the obstruction model found something, labelled <code>Obstacle</code>. The badge in the bottom corner gives the age of the reading; boxes fade from green to amber as they get stale and disappear entirely once too old.</li>
+      <li><b>Status and fix.</b> <code>Connected</code>, <code>Disconnected</code> or <code>Reconnecting…</code>, with the GPS fix quality and satellite count underneath.</li>
+      <li><b>START AUTO / STOP AUTO.</b> The main control. Starts autonomous driving, and stops it again.</li>
+      <li><b>GPS chip.</b> Reads <code>GPS n sats</code> in green on a good fix, or <code>NO GPS n in view</code> in grey while searching. A climbing count means the antenna is working.</li>
+    </ol>
+  </div>
+
+  <h3>Running the robot autonomously</h3>
+  <ol class="steps">
+    <li>Check the Wi-Fi icon and the status line both show the robot is connected.</li>
+    <li>Check the camera is live. If the screen reads <code>NO CAMERA FEED</code>, the view is replaced by a Lidar radar display, and the obstruction model has nothing to work from.</li>
+    <li>Make sure nobody is standing near the robot.</li>
+    <li>Press <b>START AUTO</b>. The robot drives forward and handles obstacles by itself; the mode indicator turns amber and the run timer starts.</li>
+    <li>Watch the banners while it runs. The robot stops, reverses and turns on its own — the banner says which it is doing.</li>
+    <li>Press <b>STOP AUTO</b> to end the run. The timer stops and a confirmation of the logged run appears briefly.</li>
+  </ol>
+
+  <div class="callout warn">
+    <h4>Emergency Stop</h4>
+    <p>The red button halts the robot at once, from any state, and ends the run in progress. Use it rather than STOP AUTO whenever something is wrong — it takes one press from anywhere on this screen.</p>
+  </div>
+
+  <h3>What the banners mean</h3>
+  <div class="screen">
+    <figure>
+      <svg viewBox="0 0 300 236" role="img" aria-label="The four warning banners stacked: NO PATH, DANGER, CAUTION and UNSUPPORTED FIELD TYPE">
+        <rect width="300" height="236" rx="14" fill="#0C1A10"/>
+        <g font-family="Rajdhani,sans-serif">
+          <rect x="14" y="14" width="272" height="44" rx="13" fill="#C62828" fill-opacity=".94"/>
+          <g stroke="#fff" stroke-width="2" fill="none"><circle cx="36" cy="36" r="9"/><path d="M30 30l12 12"/></g>
+          <text x="54" y="33" fill="#fff" font-size="15" font-weight="800" letter-spacing="1.2">NO PATH</text>
+          <text x="54" y="48" fill="#fff" font-size="11" font-weight="600">boxed in - no way forward, back or around</text>
+
+          <rect x="14" y="66" width="272" height="44" rx="13" fill="#E53935" fill-opacity=".94"/>
+          <g stroke="#fff" stroke-width="2" fill="none"><circle cx="36" cy="88" r="9"/><path d="M36 83v5"/><path d="M36 92v1"/></g>
+          <text x="54" y="85" fill="#fff" font-size="15" font-weight="800" letter-spacing="1.2">DANGER</text>
+          <text x="54" y="100" fill="#fff" font-size="11" font-weight="600">FRONT - 0.42m  -  REVERSING</text>
+
+          <rect x="14" y="118" width="272" height="44" rx="13" fill="#FFB300" fill-opacity=".94"/>
+          <g stroke="#fff" stroke-width="2" fill="none"><path d="M27 146l9-16 9 16z"/><path d="M36 136v4"/></g>
+          <text x="54" y="137" fill="#fff" font-size="15" font-weight="800" letter-spacing="1.2">CAUTION</text>
+          <text x="54" y="152" fill="#fff" font-size="11" font-weight="600">FRONT-LEFT - 0.84m</text>
+
+          <rect x="14" y="170" width="272" height="48" rx="13" fill="#546E7A" fill-opacity=".94"/>
+          <g stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"><path d="M36 200v-12"/><path d="M36 194c-6-4-9-1-11 2"/><path d="M36 190c6-4 9-2 11 1"/></g>
+          <text x="54" y="191" fill="#fff" font-size="14" font-weight="800" letter-spacing="1">UNSUPPORTED FIELD TYPE</text>
+          <text x="54" y="206" fill="#fff" font-size="11" font-weight="600">soil camera: not a supported field (82%)</text>
+        </g>
+      </svg>
+      <figcaption>Fig. 3 — Banner types, most severe first</figcaption>
+    </figure>
+    <div style="min-width:0">
+      <p class="lede">Banners stack top-centre with the most serious at the top, and each disappears on its own once the condition passes. They are all hidden while the app is disconnected.</p>
+      <div class="tscroll">
+        <table>
+          <thead><tr><th>Banner</th><th>What it means</th><th>What to do</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip c-nopath">NO PATH</span></td><td>Boxed in — forward, reverse and both sides are all blocked. The robot holds still rather than shuffling.</td><td>Move the robot or clear an obstacle by hand. It will resume once a way out opens.</td></tr>
+            <tr><td><span class="chip c-danger">DANGER</span></td><td>An obstacle very close, with the direction and distance. The action being taken is appended — <code>STOPPING</code>, <code>REVERSING</code>, <code>TURNING LEFT</code>, <code>TURNING RIGHT</code>, <code>AVOIDING</code> or <code>HOLDING</code>.</td><td>Nothing. The robot is already handling it. Watch that the maneuver is sensible.</td></tr>
+            <tr><td><span class="chip c-caution">CAUTION</span></td><td>Something within about a metre. A heads-up rather than a problem.</td><td>Nothing.</td></tr>
+            <tr><td><span class="chip c-field">UNSUPPORTED FIELD TYPE</span></td><td>Either the soil camera classified the ground as a field type the system does not handle, or there is no GPS fix so the ground cannot be confirmed at all. The detail line says which.</td><td>Move the robot onto supported ground, or wait for a GPS fix if that is the stated reason.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>An action banner can also appear on its own, in amber, when the robot is still completing a maneuver after the obstacle has already cleared.</p>
+    </div>
+  </div>
+</section>
+
+<section id="lidarmap">
+  <h2><span class="num">04</span> Lidar Map and saving maps</h2>
+  <p class="lede">Opened with the radar icon. Shows the live Lidar scan and holds the controls for the robot's own built map.</p>
+
+  <div class="screen">
+    <figure>
+      <svg viewBox="0 0 330 660" role="img" aria-label="Lidar map screen with the radar view, point count and the three map buttons">
+        <defs><clipPath id="scr5"><rect width="330" height="660" rx="14"/></clipPath></defs>
+        <g clip-path="url(#scr5)">
+        <rect width="330" height="660" fill="#0C1A10"/>
+        <rect width="330" height="56" fill="#15271B"/>
+        <g stroke="#EAF7E1" stroke-width="2" fill="none" stroke-linecap="round"><path d="M24 28h-8"/><path d="M20 23l-5 5 5 5"/></g>
+        <text x="36" y="34" fill="#EAF7E1" font-family="Rajdhani,sans-serif" font-size="16" font-weight="700" letter-spacing="1.5">LIDAR MAP</text>
+
+        <!-- radar -->
+        <rect x="16" y="72" width="298" height="298" rx="16" fill="#1E3526" stroke="#2A4632"/>
+        <g fill="none" stroke="#6FD24A" stroke-opacity=".15">
+          <circle cx="165" cy="221" r="49"/><circle cx="165" cy="221" r="98"/><circle cx="165" cy="221" r="147"/>
+        </g>
+        <circle cx="165" cy="221" r="5" fill="#F5B301"/>
+        <g fill="#FF3B30">
+          <circle cx="165" cy="128" r="2.5"/><circle cx="180" cy="130" r="2.5"/><circle cx="150" cy="132" r="2.5"/>
+          <circle cx="134" cy="140" r="2.5"/><circle cx="196" cy="142" r="2.5"/><circle cx="118" cy="158" r="2.5"/>
+          <circle cx="212" cy="166" r="2.5"/><circle cx="106" cy="186" r="2.5"/><circle cx="226" cy="196" r="2.5"/>
+          <circle cx="62" cy="221" r="2.5"/><circle cx="68" cy="246" r="2.5"/><circle cx="262" cy="226" r="2.5"/>
+          <circle cx="258" cy="252" r="2.5"/><circle cx="84" cy="282" r="2.5"/><circle cx="240" cy="286" r="2.5"/>
+          <circle cx="120" cy="306" r="2.5"/><circle cx="208" cy="310" r="2.5"/><circle cx="165" cy="318" r="2.5"/>
+          <circle cx="144" cy="316" r="2.5"/><circle cx="188" cy="316" r="2.5"/>
+        </g>
+        <text x="16" y="392" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="12.5">214 point(s) live</text>
+
+        <!-- buttons -->
+        <rect x="16" y="408" width="298" height="46" rx="14" fill="#6FD24A"/>
+        <g stroke="#06210C" stroke-width="2" fill="none"><path d="M106 424v10"/><path d="M101 429l5 5 5-5"/><path d="M100 438h12"/></g>
+        <text x="122" y="437" fill="#06210C" font-family="Rajdhani,sans-serif" font-size="15" font-weight="700" letter-spacing="1.1">SAVE CURRENT MAP</text>
+
+        <rect x="16" y="464" width="298" height="46" rx="14" fill="none" stroke="#6FD24A" stroke-width="1.6"/>
+        <g stroke="#6FD24A" stroke-width="1.7" fill="none"><path d="M88 480l6 3 6-3v12l-6 3-6-3z"/></g>
+        <text x="110" y="492" fill="#6FD24A" font-family="Rajdhani,sans-serif" font-size="13.5" font-weight="700" letter-spacing=".9">SAVE SLAM MAP SNAPSHOT</text>
+        <text x="16" y="526" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="11">Saves the actual SLAM-built map from the robot into its</text>
+        <text x="16" y="540" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="11">gallery. Different from the radar screenshot above.</text>
+
+        <rect x="16" y="552" width="298" height="46" rx="14" fill="none" stroke="#E5533D" stroke-width="1.6"/>
+        <g stroke="#E5533D" stroke-width="1.7" fill="none"><path d="M104 570h12"/><path d="M106 570v12h8v-12"/><path d="M108 566h4"/></g>
+        <text x="126" y="580" fill="#E5533D" font-family="Rajdhani,sans-serif" font-size="14" font-weight="700" letter-spacing=".9">RESET MAPPED AREA</text>
+        <text x="16" y="614" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="11">Wipes the robot's current SLAM map and starts mapping</text>
+        <text x="16" y="628" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="11">over from scratch. Saved snapshots are not deleted.</text>
+
+        <!-- callouts -->
+        <g font-family="Rajdhani,sans-serif" font-size="14" font-weight="700">
+          <circle cx="294" cy="94" r="13" fill="#6FD24A"/><text x="294" y="99" text-anchor="middle" fill="#06210C">1</text>
+          <circle cx="294" cy="431" r="13" fill="#6FD24A" stroke="#06210C"/><text x="294" y="436" text-anchor="middle" fill="#06210C">2</text>
+          <circle cx="294" cy="487" r="13" fill="#6FD24A"/><text x="294" y="492" text-anchor="middle" fill="#06210C">3</text>
+          <circle cx="294" cy="575" r="13" fill="#6FD24A"/><text x="294" y="580" text-anchor="middle" fill="#06210C">4</text>
+        </g>
+        </g>
+      </svg>
+      <figcaption>Fig. 4 — Lidar Map screen</figcaption>
+    </figure>
+    <ol class="keys">
+      <li><b>Radar view.</b> The live Lidar scan around the robot. The amber dot at the centre is the robot, the faint rings are 1, 2 and 3 metres, and the red dots are returns — things the Lidar can see. Front is up.</li>
+      <li><b>SAVE CURRENT MAP.</b> Saves a picture of this radar view onto the phone. It is a screenshot of the display, and it only lasts for the current app session.</li>
+      <li><b>SAVE SLAM MAP SNAPSHOT.</b> Tells the robot to save its real built map, with the path it drove drawn on top. This is the one that lasts — it goes into the robot's gallery under the MAPS tab.</li>
+      <li><b>RESET MAPPED AREA.</b> Wipes the map the robot is currently building and starts it over. Asks for confirmation first. Snapshots you already saved are not touched.</li>
+    </ol>
+  </div>
+
+  <div class="callout">
+    <p><b>Two different things called a map.</b> Button 2 saves what you are looking at, to the phone, for this session only. Button 3 saves the robot's accumulated map of the area, to the robot, permanently. For a record of a field, use button 3.</p>
+  </div>
+
+  <p>Below the buttons, <b>SAVED THIS SESSION</b> lists the radar screenshots taken since the app opened. Tap one to view it, or CLEAR to empty the list.</p>
+</section>
+
+<section id="gallery">
+  <h2><span class="num">05</span> Saved Images</h2>
+  <p class="lede">Opened with the photo icon. Everything the robot has saved, served from the robot itself — so it only loads while connected.</p>
+
+  <div class="screen">
+    <figure>
+      <svg viewBox="0 0 330 660" role="img" aria-label="Saved Images screen with four tabs and a grid of photo thumbnails">
+        <defs><clipPath id="scr6"><rect width="330" height="660" rx="14"/></clipPath></defs>
+        <g clip-path="url(#scr6)">
+        <rect width="330" height="660" fill="#0C1A10"/>
+        <rect width="330" height="96" fill="#15271B"/>
+        <g stroke="#EAF7E1" stroke-width="2" fill="none" stroke-linecap="round"><path d="M24 30h-8"/><path d="M20 25l-5 5 5 5"/></g>
+        <text x="36" y="36" fill="#EAF7E1" font-family="Rajdhani,sans-serif" font-size="16" font-weight="700" letter-spacing="1.5">SAVED IMAGES</text>
+        <g font-family="Rajdhani,sans-serif" font-size="12" font-weight="700" letter-spacing=".9">
+          <text x="14" y="80" fill="#8FB89B">CAPTURES</text>
+          <text x="94" y="80" fill="#6FD24A">DETECTIONS</text>
+          <text x="188" y="80" fill="#8FB89B">SOIL</text>
+          <text x="236" y="80" fill="#8FB89B">MAPS</text>
+        </g>
+        <rect x="90" y="90" width="92" height="3" fill="#6FD24A"/>
+
+        <!-- grid of thumbs -->
+        <g>
+          <g><rect x="14" y="110" width="96" height="96" rx="8" fill="#243018"/><rect x="36" y="140" width="40" height="44" fill="none" stroke="#6FD24A" stroke-width="2"/><path d="M14 180h96v26H14z" fill="#000" fill-opacity=".45"/><text x="20" y="197" fill="#EAF7E1" font-family="IBM Plex Mono,monospace" font-size="7.5">14.7481, 121.0616</text></g>
+          <g><rect x="117" y="110" width="96" height="96" rx="8" fill="#2a3520"/><rect x="140" y="134" width="52" height="40" fill="none" stroke="#6FD24A" stroke-width="2"/><path d="M117 180h96v26h-96z" fill="#000" fill-opacity=".45"/><text x="123" y="197" fill="#EAF7E1" font-family="IBM Plex Mono,monospace" font-size="7.5">14.7483, 121.0619</text></g>
+          <g><rect x="220" y="110" width="96" height="96" rx="8" fill="#212d1a"/><rect x="246" y="146" width="44" height="34" fill="none" stroke="#F5B301" stroke-width="2"/><path d="M220 180h96v26h-96z" fill="#000" fill-opacity=".45"/><text x="226" y="197" fill="#8FB89B" font-family="IBM Plex Mono,monospace" font-size="7.5">no GPS fix</text></g>
+
+          <g><rect x="14" y="213" width="96" height="96" rx="8" fill="#2c3822"/><rect x="34" y="240" width="48" height="42" fill="none" stroke="#6FD24A" stroke-width="2"/><path d="M14 283h96v26H14z" fill="#000" fill-opacity=".45"/><text x="20" y="300" fill="#EAF7E1" font-family="IBM Plex Mono,monospace" font-size="7.5">14.7486, 121.0622</text></g>
+          <g><rect x="117" y="213" width="96" height="96" rx="8" fill="#232f1b"/><rect x="146" y="236" width="38" height="48" fill="none" stroke="#6FD24A" stroke-width="2"/><path d="M117 283h96v26h-96z" fill="#000" fill-opacity=".45"/><text x="123" y="300" fill="#EAF7E1" font-family="IBM Plex Mono,monospace" font-size="7.5">14.7488, 121.0625</text></g>
+          <g><rect x="220" y="213" width="96" height="96" rx="8" fill="#29341f"/><rect x="242" y="244" width="52" height="38" fill="none" stroke="#6FD24A" stroke-width="2"/><path d="M220 283h96v26h-96z" fill="#000" fill-opacity=".45"/><text x="226" y="300" fill="#EAF7E1" font-family="IBM Plex Mono,monospace" font-size="7.5">14.7490, 121.0628</text></g>
+
+          <g opacity=".65">
+            <rect x="14" y="316" width="96" height="96" rx="8" fill="#243018"/>
+            <rect x="117" y="316" width="96" height="96" rx="8" fill="#2a3520"/>
+            <rect x="220" y="316" width="96" height="96" rx="8" fill="#212d1a"/>
+          </g>
+        </g>
+
+        <!-- viewer action strip illustration -->
+        <rect x="14" y="440" width="302" height="1" fill="#2A4632"/>
+        <text x="14" y="470" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="11" letter-spacing="1.4" font-weight="700">OPEN ONE IMAGE</text>
+        <rect x="14" y="482" width="302" height="152" rx="12" fill="#000"/>
+        <rect x="14" y="482" width="302" height="40" rx="12" fill="#111"/>
+        <text x="28" y="507" fill="#fff" font-family="IBM Plex Mono,monospace" font-size="9.5">capture_20261010_0914_lat14.7483…</text>
+        <g stroke="#fff" stroke-width="1.6" fill="none"><path d="M292 496h12"/><path d="M294 496v12h8v-12"/></g>
+        <rect x="104" y="534" width="122" height="88" rx="6" fill="#263520"/>
+        <rect x="128" y="552" width="70" height="56" fill="none" stroke="#6FD24A" stroke-width="2"/>
+
+        <!-- callouts -->
+        <g font-family="Rajdhani,sans-serif" font-size="14" font-weight="700">
+          <circle cx="302" cy="74" r="13" fill="#6FD24A"/><text x="302" y="79" text-anchor="middle" fill="#06210C">1</text>
+          <circle cx="282" cy="196" r="13" fill="#6FD24A"/><text x="282" y="201" text-anchor="middle" fill="#06210C">2</text>
+          <circle cx="268" cy="500" r="13" fill="#6FD24A"/><text x="268" y="505" text-anchor="middle" fill="#06210C">3</text>
+        </g>
+        </g>
+      </svg>
+      <figcaption>Fig. 5 — Saved Images, DETECTIONS tab</figcaption>
+    </figure>
+    <ol class="keys">
+      <li><b>Four tabs.</b> <b>CAPTURES</b> — the plain photo of each obstruction found. <b>DETECTIONS</b> — the same photo with the detection boxes drawn on. <b>SOIL</b> — downward soil-camera snapshots, taken automatically every minute. <b>MAPS</b> — the SLAM maps you saved.</li>
+      <li><b>Coordinates on each thumbnail.</b> Where the photo was taken. A photo taken without a fix says so rather than showing a guessed position — the position is never carried over from an earlier reading.</li>
+      <li><b>Delete.</b> Removes the image from the robot, after a confirmation. For a capture or a detection it removes both halves of the pair, since they are the same moment.</li>
+    </ol>
+  </div>
+
+  <p>Swipe sideways in the viewer to move through the images, and pinch to zoom. If the grid says it cannot reach the gallery, the robot is not responding — check the connection and press RETRY.</p>
+
+  <div class="callout">
+    <p><b>Soil photos need nothing from you.</b> The downward camera saves one image a minute on its own, tagged with the position and with the time and coordinates printed on the picture. There is no button for it.</p>
+  </div>
+</section>
+
+<section id="logs">
+  <h2><span class="num">06</span> Run Logs</h2>
+  <p class="lede">Opened with the timer icon. One entry per autonomous run, kept on the phone.</p>
+
+  <div class="screen">
+    <figure>
+      <svg viewBox="0 0 330 520" role="img" aria-label="Run logs screen with an in-progress run and two finished run cards">
+        <defs><clipPath id="scr7"><rect width="330" height="520" rx="14"/></clipPath></defs>
+        <g clip-path="url(#scr7)">
+        <rect width="330" height="520" fill="#0C1A10"/>
+        <rect width="330" height="56" fill="#15271B"/>
+        <g stroke="#EAF7E1" stroke-width="2" fill="none" stroke-linecap="round"><path d="M24 28h-8"/><path d="M20 23l-5 5 5 5"/></g>
+        <text x="36" y="34" fill="#EAF7E1" font-family="Rajdhani,sans-serif" font-size="16" font-weight="700" letter-spacing="1.5">RUN LOGS</text>
+        <g stroke="#EAF7E1" stroke-width="1.7" fill="none"><path d="M296 22h12"/><path d="M298 22v12h8V22"/><path d="M300 18h4"/></g>
+
+        <!-- active card -->
+        <rect x="14" y="72" width="302" height="48" rx="10" fill="#15271B" stroke="#6FD24A" stroke-width="1.5"/>
+        <circle cx="34" cy="96" r="7" fill="#6FD24A"/>
+        <text x="50" y="101" fill="#EAF7E1" font-family="Rajdhani,sans-serif" font-size="14" font-weight="700">Run in progress - started 09:14</text>
+
+        <!-- run card 1 -->
+        <rect x="14" y="130" width="302" height="108" rx="10" fill="#15271B" stroke="#2A4632"/>
+        <text x="28" y="158" fill="#EAF7E1" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700">6m 42s</text>
+        <text x="302" y="156" text-anchor="end" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="11">10 Oct  08:31-08:38</text>
+        <g stroke="#6FD24A" stroke-width="1.4" fill="none"><circle cx="31" cy="176" r="5"/></g>
+        <text x="44" y="180" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="11">from</text>
+        <text x="76" y="180" fill="#EAF7E1" font-family="IBM Plex Mono,monospace" font-size="10.5">14.748134, 121.061668</text>
+        <g transform="translate(31 194)"><path d="M0 4c-4-5-6-7-6-10a6 6 0 0 1 12 0c0 3-2 5-6 10z" fill="#6FD24A"/></g>
+        <text x="44" y="198" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="11">to</text>
+        <text x="76" y="198" fill="#EAF7E1" font-family="IBM Plex Mono,monospace" font-size="10.5">14.748902, 121.062410</text>
+        <g stroke="#6FD24A" stroke-width="1.5" fill="none"><path d="M26 218h4"/><path d="M28 214h8"/><path d="M32 222h6"/></g>
+        <text x="44" y="222" fill="#EAF7E1" font-family="Rajdhani,sans-serif" font-size="12" font-weight="700">travelled 142 m</text>
+        <text x="136" y="222" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="11">(98.4 m apart)</text>
+
+        <!-- run card 2 -->
+        <rect x="14" y="248" width="302" height="92" rx="10" fill="#15271B" stroke="#2A4632"/>
+        <text x="28" y="276" fill="#EAF7E1" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700">2m 05s</text>
+        <text x="302" y="274" text-anchor="end" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="11">09 Oct  16:12-16:14</text>
+        <g stroke="#8FB89B" stroke-width="1.4" fill="none"><circle cx="31" cy="294" r="5"/></g>
+        <text x="44" y="298" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="11">from</text>
+        <text x="76" y="298" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="10.5">no GPS fix</text>
+        <g transform="translate(31 312)"><path d="M0 4c-4-5-6-7-6-10a6 6 0 0 1 12 0c0 3-2 5-6 10z" fill="#8FB89B"/></g>
+        <text x="44" y="316" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="11">to</text>
+        <text x="76" y="316" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="10.5">no GPS fix</text>
+
+        <g font-family="Rajdhani,sans-serif" font-size="14" font-weight="700">
+          <circle cx="302" cy="52" r="13" fill="#6FD24A"/><text x="302" y="57" text-anchor="middle" fill="#06210C">1</text>
+          <circle cx="302" cy="96" r="13" fill="#6FD24A"/><text x="302" y="101" text-anchor="middle" fill="#06210C">2</text>
+          <circle cx="302" cy="190" r="13" fill="#6FD24A"/><text x="302" y="195" text-anchor="middle" fill="#06210C">3</text>
+          <circle cx="302" cy="298" r="13" fill="#6FD24A"/><text x="302" y="303" text-anchor="middle" fill="#06210C">4</text>
+        </g>
+        </g>
+      </svg>
+      <figcaption>Fig. 6 — Run Logs</figcaption>
+    </figure>
+    <ol class="keys">
+      <li><b>Clear all logs.</b> Deletes every entry, after a confirmation. There is no undo.</li>
+      <li><b>Run in progress.</b> Shown while a run is still being timed. The ticking clock is on the control screen, not here.</li>
+      <li><b>A finished run.</b> Duration, the date and the clock times, where it started and ended, the distance actually driven, and how far apart the two ends were in a straight line.</li>
+      <li><b>Runs without a fix.</b> Still recorded, with the duration intact and the positions marked as unavailable rather than filled in with a guess.</li>
+    </ol>
+  </div>
+
+  <p>Runs are recorded automatically: one starts when you press START AUTO and closes when you press STOP AUTO or the Emergency Stop. They are stored on the phone, so they survive restarting the app but not reinstalling it.</p>
+</section>
+
+<section id="trouble">
+  <h2><span class="num">07</span> If something is not working</h2>
+  <div class="tscroll">
+    <table>
+      <thead><tr><th>What you see</th><th>Likely cause</th><th>What to try</th></tr></thead>
+      <tbody>
+        <tr><td>Wi-Fi icon shows disconnected, status reads <code>Reconnecting…</code></td><td>Wrong IP address, phone on another network, or the robot still booting.</td><td>Confirm both are on the same Wi-Fi. Wait a minute after power-up. Go back and re-enter the address.</td></tr>
+        <tr><td><code>NO CAMERA FEED</code></td><td>The camera did not come up on the robot.</td><td>Power the robot down and up again. Until it returns, there are no detection boxes and no obstruction photos — Lidar avoidance still works.</td></tr>
+        <tr><td><code>NO GPS</code> with a satellite count that never climbs</td><td>Indoors, under cover, or an antenna problem.</td><td>Move into the open and allow a few minutes. A count that climbs means it is working; one stuck at the same number is not.</td></tr>
+        <tr><td>Detection boxes sit still or lag behind the video</td><td>Normal. The model runs every few seconds, so the boxes always trail the picture.</td><td>Read the age badge in the corner. Boxes fade as they age and clear once stale.</td></tr>
+        <tr><td><code>NO PATH</code> and the robot will not move</td><td>Boxed in on all sides.</td><td>Clear an obstacle or move the robot. It starts again by itself once there is a way out.</td></tr>
+        <tr><td>Gallery says it cannot reach the server</td><td>The robot is unreachable or its gallery service is down.</td><td>Press RETRY. If it keeps failing, check the connection on the control screen.</td></tr>
+        <tr><td>The robot drives slower than expected</td><td>The camera has seen something ahead, so the speed is capped until it clears.</td><td>Nothing — this is the intended behaviour. It returns to full speed once the view is clear.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<hr class="end">
+<p class="foot">The screens in this manual are drawn from the app's own layout and colours rather than photographed from a handset, so wording and placement match the build but spacing may differ slightly on your phone.</p>
+
+</div>
+</body>
+</html>
