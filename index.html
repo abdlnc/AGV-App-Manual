@@ -33,3 +33,330 @@ img{max-width:100%}
   :root:not([data-theme="light"]){
     --bg:#0C1A10;
     --paper:#15271B;
+    --fg:#EAF7E1;
+    --muted:#8FB89B;
+    --rule:#2A4632;
+    --accent:#6FD24A;
+    --accent-soft:#1E3526;
+    --warn:#F5B301;
+    --danger:#E5533D;
+    --code-bg:#1E3526;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1A10;
+  --paper:#15271B;
+  --fg:#EAF7E1;
+  --muted:#8FB89B;
+  --rule:#2A4632;
+  --accent:#6FD24A;
+  --accent-soft:#1E3526;
+  --warn:#F5B301;
+  --danger:#E5533D;
+  --code-bg:#1E3526;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.6;
+  margin:0;
+  padding-inline:16px;
+  padding-block:0;
+}
+.wrap{max-width:1080px;margin:0 auto;padding-block:40px 72px}
+
+/* ---- masthead ---- */
+.mast{border-bottom:3px solid var(--accent);padding-bottom:22px;margin-bottom:8px}
+.eyebrow{
+  font-family:var(--display);font-weight:700;font-size:12px;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin:0 0 6px
+}
+h1{
+  font-family:var(--display);font-weight:700;font-size:clamp(34px,7vw,56px);
+  line-height:1.02;letter-spacing:.01em;margin:0;text-wrap:balance
+}
+.sub{color:var(--muted);font-size:17px;margin:12px 0 0;max-width:62ch}
+
+.note{
+  background:var(--accent-soft);border-left:3px solid var(--accent);
+  padding:14px 18px;margin:26px 0 0;border-radius:0 8px 8px 0;font-size:15px
+}
+.note strong{font-family:var(--display);letter-spacing:.04em}
+
+/* ---- sections ---- */
+section{margin-top:56px;scroll-margin-top:24px}
+h2{
+  font-family:var(--display);font-weight:700;font-size:clamp(24px,4vw,32px);
+  letter-spacing:.01em;margin:0 0 4px;text-wrap:balance;
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap
+}
+h2 .num{
+  font-size:14px;letter-spacing:.14em;color:var(--accent);
+  border:1.5px solid var(--accent);border-radius:999px;padding:3px 11px;
+  flex:none;line-height:1.2
+}
+h3{
+  font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:.05em;
+  text-transform:uppercase;margin:34px 0 10px;color:var(--fg)
+}
+.lede{color:var(--muted);margin:0 0 4px;max-width:66ch}
+p{max-width:66ch}
+
+/* ---- figure + keys ---- */
+.screen{
+  display:grid;grid-template-columns:minmax(0,290px) minmax(0,1fr);
+  gap:34px;align-items:start;margin-top:26px
+}
+@media (max-width:720px){.screen{grid-template-columns:1fr;gap:22px}}
+figure{margin:0}
+figure svg{display:block;width:100%;height:auto;max-width:100%;border-radius:14px;border:1px solid var(--rule)}
+figcaption{
+  font-family:var(--display);font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);margin-top:10px
+}
+
+/* numbered key list keyed to the figure badges */
+ol.keys{list-style:none;counter-reset:k;margin:0;padding:0;display:grid;gap:13px}
+ol.keys li{
+  counter-increment:k;position:relative;padding-left:38px;font-size:15.3px;min-width:0
+}
+ol.keys li::before{
+  content:counter(k);position:absolute;left:0;top:1px;
+  width:25px;height:25px;border-radius:999px;
+  background:var(--accent);color:var(--bg);
+  font-family:var(--display);font-weight:700;font-size:14px;
+  display:grid;place-items:center
+}
+ol.keys b{font-weight:600}
+
+/* ---- ordered procedure ---- */
+ol.steps{padding-left:22px;margin:14px 0;display:grid;gap:10px}
+ol.steps li{padding-left:4px;max-width:64ch}
+ul.plain{padding-left:20px;margin:12px 0;display:grid;gap:8px}
+ul.plain li{max-width:64ch}
+
+/* ---- tables ---- */
+.tscroll{overflow-x:auto;margin:16px 0;border:1px solid var(--rule);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:480px;background:var(--paper);font-size:14.8px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{
+  font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);background:var(--code-bg)
+}
+tr:last-child td{border-bottom:none}
+td b{font-weight:600}
+
+/* severity chips in the banner table */
+.chip{
+  display:inline-block;font-family:var(--display);font-weight:700;font-size:11.5px;
+  letter-spacing:.09em;padding:3px 9px;border-radius:5px;color:#fff;white-space:nowrap
+}
+.c-nopath{background:#C62828}.c-danger{background:#E53935}
+.c-caution{background:#C98A00}.c-field{background:#546E7A}
+
+code{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.9em;
+  background:var(--code-bg);padding:1.5px 6px;border-radius:4px
+}
+
+.callout{
+  border:1px solid var(--rule);border-radius:10px;padding:16px 18px;
+  background:var(--paper);margin:20px 0;font-size:15px
+}
+.callout.warn{border-left:3px solid var(--warn)}
+.callout h4{
+  font-family:var(--display);font-size:15px;letter-spacing:.07em;text-transform:uppercase;
+  margin:0 0 6px;color:var(--warn)
+}
+.callout p{margin:0;max-width:64ch}
+
+a{color:var(--accent);text-underline-offset:2px}
+hr.end{border:none;border-top:1px solid var(--rule);margin:56px 0 0}
+.foot{color:var(--muted);font-size:14px;margin-top:18px}
+
+/* --- print: forced light, and no component split across a page break --- */
+@media print{
+  @page{margin:14mm}
+  :root{
+    --bg:#fff;--paper:#fff;--fg:#14190F;--muted:#4A5547;--rule:#BFC9BB;
+    --accent:#2F6B1C;--accent-soft:#F1F6ED;--warn:#7A5400;--danger:#A3302A;--code-bg:#F1F3EF;
+    color-scheme:light;
+  }
+  body{padding-inline:0}
+  .wrap{max-width:none;padding-block:0}
+  h2,h3{break-after:avoid}
+  .screen,figure,.callout,.note,tr{break-inside:avoid}
+  .tscroll{overflow:visible;border:none}
+  table{min-width:0;border:1px solid var(--rule)}
+  .foot{break-before:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow">Field Operation Guide</p>
+  <h1>AGV&nbsp;Robot&nbsp;Controller</h1>
+  <p class="sub">How to connect to the robot, run it autonomously, fence and cover a field from the GPS map, and get at the maps and photos it saves — using the Android controller app.</p>
+</header>
+
+<div class="note">
+  <strong>Who this is for.</strong> Everything in this manual is a control an operator can reach from a normal install of the app. Bench-test and calibration controls are not covered.
+</div>
+
+
+<section id="before">
+  <h2><span class="num">01</span> Before you switch on</h2>
+  <p class="lede">The phone talks to the robot over Wi-Fi. Both have to be on the same network, and the robot needs about a minute after power-up before it starts answering.</p>
+  <ol class="steps">
+    <li>Power the robot. Its software starts on its own — nothing to launch by hand.</li>
+    <li>Put the phone on the <b>same Wi-Fi network</b> as the robot. There is no Bluetooth or direct-cable fallback.</li>
+    <li>Have the robot's <b>IP address</b> to hand. It is the number you type on the first screen, and it can change when the robot joins a different network.</li>
+    <li>So photos are tagged with a position, start the robot <b>outdoors with open sky</b>. A fix needs at least four satellites and usually takes a few minutes from cold.</li>
+    <li>Wait roughly <b>60 seconds</b> after power-up, then connect.</li>
+  </ol>
+  <p><b>If a field boundary is saved on the robot</b>, it will not drive itself at all — not in AUTO, not to a waypoint, not in COVER — until it has a GPS fix. Without a fix it cannot prove it is inside the field, so it holds still.</p>
+  <div class="callout warn">
+    <h4>Clear the area first</h4>
+    <p>Once you press START AUTO the robot drives off by itself. Stand clear of it, and keep the phone in your hand the whole time it is moving — the red stop button is the fastest way to halt it.</p>
+  </div>
+</section>
+
+<section id="connect">
+  <h2><span class="num">02</span> Connecting to the robot</h2>
+  <p class="lede">The first screen does one job: point the app at the robot.</p>
+
+  <div class="screen">
+    <figure>
+      <svg viewBox="0 0 300 600" role="img" aria-label="Connection screen with an IP address field and a CONNECT button">
+        <rect width="300" height="600" rx="14" fill="#0C1A10"/>
+        <!-- logo badge -->
+        <rect x="100" y="86" width="100" height="100" rx="26" fill="#15271B" stroke="#2A4632"/>
+        <g stroke="#6FD24A" stroke-width="2.4" fill="none" stroke-linecap="round">
+          <path d="M126 150h48"/><path d="M134 150v-16h32v16"/>
+          <circle cx="138" cy="158" r="7"/><circle cx="162" cy="158" r="7"/>
+          <path d="M150 134v-12"/>
+        </g>
+        <!-- wordmark -->
+        <text x="150" y="226" text-anchor="middle" fill="#EAF7E1" font-family="Rajdhani,sans-serif" font-size="40" font-weight="700" letter-spacing="7">AGV</text>
+        <text x="150" y="246" text-anchor="middle" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="9.5" font-weight="600" letter-spacing="2.4">AUTONOMOUS GROUND VEHICLE</text>
+        <!-- ip field -->
+        <rect x="28" y="300" width="244" height="54" rx="13" fill="#1E3526" stroke="#2A4632"/>
+        <text x="46" y="316" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="10.5" letter-spacing=".6">Raspberry Pi IP Address</text>
+        <g stroke="#8FB89B" stroke-width="1.5" fill="none"><rect x="44" y="328" width="14" height="10" rx="2"/><path d="M48 342h6"/></g>
+        <text x="68" y="340" fill="#EAF7E1" font-family="IBM Plex Mono,monospace" font-size="15" letter-spacing="1">192.168.1.24</text>
+        <!-- connect button -->
+        <rect x="28" y="378" width="244" height="54" rx="14" fill="#6FD24A"/>
+        <g stroke="#06210C" stroke-width="2.2" fill="none" stroke-linecap="round"><path d="M120 398v9"/><path d="M113 400a11 11 0 1 0 14 0"/></g>
+        <text x="152" y="412" fill="#06210C" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" letter-spacing="1.4">CONNECT</text>
+        <!-- helper -->
+        <text x="150" y="458" text-anchor="middle" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="11.5">Make sure your phone and the Pi are</text>
+        <text x="150" y="474" text-anchor="middle" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="11.5">on the same Wi-Fi.</text>
+        <!-- callouts -->
+        <circle cx="286" cy="314" r="13" fill="#6FD24A"/><text x="286" y="319" text-anchor="middle" fill="#06210C" font-family="Rajdhani,sans-serif" font-size="15" font-weight="700">1</text>
+        <circle cx="286" cy="405" r="13" fill="#6FD24A"/><text x="286" y="410" text-anchor="middle" fill="#06210C" font-family="Rajdhani,sans-serif" font-size="15" font-weight="700">2</text>
+      </svg>
+      <figcaption>Fig. 1 — Connection screen</figcaption>
+    </figure>
+    <ol class="keys">
+      <li><b>Raspberry Pi IP Address.</b> Replace the placeholder with the robot's actual address, for example <code>192.168.1.24</code>. The app keeps no list of past addresses, so re-enter it each launch.</li>
+      <li><b>CONNECT.</b> Opens the control screen straight away, whether or not the address was reachable. Check the Wi-Fi icon at the top right of the control screen to see whether the link really came up.</li>
+    </ol>
+  </div>
+
+  <p>If the icon shows as disconnected, the app keeps retrying on its own and the status line reads <code>Reconnecting…</code>. You do not need to back out and press CONNECT again unless you mistyped the address.</p>
+</section>
+
+<section id="control">
+  <h2><span class="num">03</span> The control screen</h2>
+  <p class="lede">This is where the robot is driven and watched. The live camera fills the screen, with status and controls layered over it.</p>
+
+  <div class="screen">
+    <figure>
+      <svg viewBox="0 0 330 660" role="img" aria-label="Control screen showing the live camera, detection box, top button bar, a caution banner and the bottom status panel">
+        <defs><clipPath id="scr3"><rect width="330" height="660" rx="14"/></clipPath></defs>
+        <g clip-path="url(#scr3)">
+        <rect width="330" height="660" fill="#0C1A10"/>
+        <!-- camera feed: simple field scene -->
+        <rect width="330" height="660" fill="#1b2a18"/>
+        <path d="M0 300h330v360H0z" fill="#2f3d22"/>
+        <path d="M0 300h330v26H0z" fill="#3b4a2a"/>
+        <ellipse cx="90" cy="470" rx="78" ry="26" fill="#27341c"/>
+        <ellipse cx="256" cy="402" rx="52" ry="18" fill="#27341c"/>
+        <!-- a plant in frame -->
+        <g stroke="#4a6b2e" stroke-width="5" fill="none" stroke-linecap="round">
+          <path d="M150 432v-54"/><path d="M150 398c-16-10-24-4-30 4"/><path d="M150 388c15-11 24-6 30 3"/><path d="M150 410c-13 6-16 14-14 22"/>
+        </g>
+        <ellipse cx="150" cy="434" rx="30" ry="8" fill="#22301a"/>
+        <!-- AI detection box -->
+        <rect x="112" y="356" width="78" height="90" fill="none" stroke="#6FD24A" stroke-width="2.5"/>
+        <rect x="112" y="340" width="56" height="16" fill="#6FD24A" fill-opacity=".85"/>
+        <text x="117" y="352" fill="#fff" font-family="Rajdhani,sans-serif" font-size="11" font-weight="600">Obstacle</text>
+        <!-- AI age badge -->
+        <rect x="12" y="612" width="84" height="20" rx="5" fill="#000" fill-opacity=".55"/>
+        <text x="20" y="626" fill="#fff" font-family="Rajdhani,sans-serif" font-size="11" font-weight="600">AI 1.4s ago</text>
+
+        <!-- top bar -->
+        <rect x="10" y="14" width="66" height="34" rx="17" fill="#15271B" fill-opacity=".85" stroke="#F5B301" stroke-opacity=".6"/>
+        <g fill="#F5B301"><rect x="20" y="24" width="13" height="11" rx="3"/><circle cx="24" cy="28" r="1.5" fill="#15271B"/><circle cx="29" cy="28" r="1.5" fill="#15271B"/></g>
+        <text x="38" y="36" fill="#F5B301" font-family="Rajdhani,sans-serif" font-size="13" font-weight="700" letter-spacing="1.2">AUTO</text>
+        <!-- run timer -->
+        <rect x="80" y="14" width="54" height="34" rx="17" fill="#15271B" fill-opacity=".85" stroke="#F5B301"/>
+        <circle cx="92" cy="31" r="4.5" fill="#F5B301"/>
+        <text x="100" y="35.5" fill="#EAF7E1" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="600">04:12</text>
+        <!-- circular buttons: Wi-Fi, GPS map, Lidar map, run logs, saved images, stop -->
+        <g font-family="Rajdhani,sans-serif">
+          <circle cx="155" cy="31" r="14" fill="#15271B" fill-opacity=".85" stroke="#2A4632"/>
+          <g stroke="#EAF7E1" stroke-width="1.6" fill="none" stroke-linecap="round"><path d="M149 29a8.5 8.5 0 0 1 12 0"/><path d="M152 33a4.5 4.5 0 0 1 6 0"/></g>
+          <circle cx="187" cy="31" r="14" fill="#15271B" fill-opacity=".85" stroke="#2A4632"/>
+          <g stroke="#6FD24A" stroke-width="1.6" fill="none" stroke-linejoin="round"><path d="M179 25l5-2 6 2 5-2v13l-5 2-6-2-5 2z"/><path d="M184 23v13"/><path d="M190 25v13"/></g>
+          <circle cx="219" cy="31" r="14" fill="#15271B" fill-opacity=".85" stroke="#2A4632"/>
+          <g stroke="#6FD24A" stroke-width="1.6" fill="none"><circle cx="219" cy="31" r="7"/><circle cx="219" cy="31" r="3"/></g>
+          <circle cx="251" cy="31" r="14" fill="#15271B" fill-opacity=".85" stroke="#2A4632"/>
+          <g stroke="#6FD24A" stroke-width="1.6" fill="none" stroke-linecap="round"><circle cx="251" cy="32" r="6.5"/><path d="M251 32v-4"/><path d="M248 23.5h6"/></g>
+          <circle cx="283" cy="31" r="14" fill="#15271B" fill-opacity=".85" stroke="#2A4632"/>
+          <g stroke="#6FD24A" stroke-width="1.6" fill="none"><rect x="276" y="25" width="14" height="11" rx="2"/><path d="M279 33l3-3 3 3"/></g>
+          <circle cx="315" cy="31" r="14" fill="#E53935" stroke="#E53935"/>
+          <rect x="309.5" y="25.5" width="11" height="11" rx="2" fill="#fff"/>
+        </g>
+
+        <!-- caution banner -->
+        <rect x="38" y="96" width="254" height="38" rx="13" fill="#FFB300" fill-opacity=".94"/>
+        <g stroke="#fff" stroke-width="2" fill="none"><path d="M54 124l9-16 9 16z"/><path d="M63 114v4"/></g>
+        <text x="80" y="114" fill="#fff" font-family="Rajdhani,sans-serif" font-size="15" font-weight="800" letter-spacing="1.2">CAUTION</text>
+        <text x="80" y="128" fill="#fff" font-family="Rajdhani,sans-serif" font-size="11.5" font-weight="600">FRONT-LEFT - 0.84m  -  TURNING RIGHT</text>
+
+        <!-- bottom panel -->
+        <path d="M0 468h330v192H0z" fill="#0C1A10" fill-opacity=".94"/>
+        <path d="M0 468q0-26 26-26h278q26 0 26 26" fill="#0C1A10" fill-opacity=".94"/>
+        <path d="M26 442h278" stroke="#F5B301" stroke-opacity=".45" stroke-width="1.5"/>
+        <text x="22" y="470" fill="#8FB89B" font-family="Rajdhani,sans-serif" font-size="11" letter-spacing="1.5">SYSTEM STATUS</text>
+        <text x="22" y="492" fill="#EAF7E1" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700">Connected</text>
+        <g stroke="#6FD24A" stroke-width="1.5" fill="none"><circle cx="27" cy="508" r="5"/><path d="M27 503v10"/></g>
+        <text x="38" y="513" fill="#EAF7E1" font-family="Rajdhani,sans-serif" font-size="12.5" font-weight="600" letter-spacing=".5">GPS · FIX 1 · 9 SAT</text>
+        <!-- start auto button -->
+        <rect x="22" y="532" width="162" height="44" rx="12" fill="#F5B301"/>
+        <g fill="#2A1B00"><circle cx="44" cy="554" r="9"/><path d="M41 549l8 5-8 5z" fill="#F5B301"/></g>
+        <text x="60" y="560" fill="#2A1B00" font-family="Rajdhani,sans-serif" font-size="15" font-weight="700" letter-spacing="1">STOP AUTO</text>
+        <!-- gps chip -->
+        <rect x="22" y="586" width="112" height="28" rx="14" fill="#15271B" fill-opacity=".85" stroke="#2A4632"/>
+        <g stroke="#5AB552" stroke-width="1.4" fill="none"><circle cx="38" cy="600" r="4.5"/><path d="M38 595v10"/></g>
+        <text x="50" y="605" fill="#5AB552" font-family="Rajdhani,sans-serif" font-size="11.5" font-weight="700" letter-spacing=".5">GPS  9 sats</text>
+
+        <!-- callout badges -->
+        <g font-family="Rajdhani,sans-serif" font-size="14" font-weight="700">
+          <circle cx="24" cy="76" r="13" fill="#6FD24A"/><text x="24" y="81" text-anchor="middle" fill="#06210C">1</text>
+          <circle cx="107" cy="68" r="13" fill="#6FD24A"/><text x="107" y="73" text-anchor="middle" fill="#06210C">2</text>
+          <circle cx="235" cy="66" r="13" fill="#6FD24A"/><text x="235" y="71" text-anchor="middle" fill="#06210C">3</text>
+          <circle cx="24" cy="160" r="13" fill="#6FD24A"/><text x="24" y="165" text-anchor="middle" fill="#06210C">4</text>
+          <circle cx="212" cy="390" r="13" fill="#6FD24A"/><text x="212" y="395" text-anchor="middle" fill="#06210C">5</text>
+          <circle cx="306" cy="492" r="13" fill="#6FD24A"/><text x="306" y="497" text-anchor="middle" fill="#06210C">6</text>
+          <circle cx="206" cy="554" r="13" fill="#6FD24A"/><text x="206" y="559" text-anchor="middle" fill="#06210C">7</text>
+          <circle cx="156" cy="600" r="13" fill="#6FD24A"/><text x="156" y="605
